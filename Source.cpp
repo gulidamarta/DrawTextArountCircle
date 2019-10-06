@@ -20,10 +20,6 @@ static int amountLetters = 0;	// current number of the entered letters
 static wchar_t *tempText = (wchar_t *)malloc(sizeof(wchar_t) * 2);
 static float currentAngel = 0;
 
-// hInstance - дескриптор экземпл€ра приложени€. Ётот дескриптор содержит адрес начала кода программы в ее адресном пространстве.
-// hPrevInstance - дескриптор предыдущего экземпл€ра приложени€, почти всегда равен NULL
-// lpCmdLine - указатель на начало командной строки, введенной при запуске программы
-// nCmdShow - это значение содержит желаемый вид окна (например, свернутый или развернутый)
 int APIENTRY WinMain(HINSTANCE hInstance,
 	HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow)
 {
@@ -33,15 +29,10 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, nullptr);
 
 	WNDCLASSEX wcex;
-	// a handle to a window
 	HWND hWnd;
 	MSG msg;
-
+	
 	wcex.cbSize = sizeof(WNDCLASSEX);
-	// при изменении размеров окна, функци€ окна может получить сообщение WM_PAINT 
-	// в этом случае функци€ окна должна перериросовать все окно или его часть
-	// CS_DBLCLKS - отслеживание двойных щелчков мыши, в функцию окна 
-	// посылаютс€ сообщени€ WM_LBUTTONDBLCLK и WM_RBUTTONDBLCLK
 	wcex.style = CS_HREDRAW | CS_VREDRAW;
 	wcex.lpfnWndProc = WndProc;
 	wcex.cbClsExtra = 0;
@@ -59,11 +50,9 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 		WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, 0,
 		CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
 
-	// Sets the specified window's show state
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
 
-	// If wMsgFilterMin and wMsgFilterMax are both zero, GetMessage returns all available messages 
 	while (GetMessage(&msg, NULL, 0, 0))
 	{
 		TranslateMessage(&msg);
@@ -100,7 +89,7 @@ void DrawImage(HDC hdc, HWND hWnd) {
 		graphics.TranslateTransform(-(centerRectX + CIRCLE_RADIUS),
 			-(centerRectY + CIRCLE_RADIUS));
 		graphics.DrawString(tempText, -1, &font, 
-			Gdiplus::PointF(centerRectX + CIRCLE_RADIUS - FONT_SIZE - 5, centerRectY - FONT_SIZE - 5), &brush);
+			Gdiplus::PointF(centerRectX + CIRCLE_RADIUS - 5, centerRectY - FONT_SIZE - 5), &brush);
 		currentAngel += 9;
 		cch--;
 		amountLetters++;
@@ -115,14 +104,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message,
 
 	switch (message)
 	{
-	case WM_CREATE:
-		hdc = BeginPaint(hWnd, &ps);
-		DrawImage(hdc, hWnd);
-		EndPaint(hWnd, &ps);
-		break;
 	case WM_CHAR:
 		SaveKey(wParam);
 		InvalidateRect(hWnd, NULL, FALSE);
+		break;
 	case WM_PAINT:
 		hdc = BeginPaint(hWnd, &ps);
 		DrawImage(hdc, hWnd);
@@ -133,14 +118,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message,
 		break;
 	case WM_GETMINMAXINFO:
 		MINMAXINFO FAR *lpMinMaxInfo;
-		// set the MINMAXINFO structure pointer 
 		lpMinMaxInfo = (MINMAXINFO FAR *) lParam;
 		lpMinMaxInfo->ptMinTrackSize.x = 250;
 		lpMinMaxInfo->ptMinTrackSize.y = 340;
 		break;
-		break;
-	//case WM_ERASEBKGND:
-		//return FALSE;
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
